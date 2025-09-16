@@ -32,6 +32,7 @@ class ROSVideoRecorder:
         # Initialize subscribers
         self._setup_subscribers()
         
+        
         rospy.loginfo("LEGO video recorder started")
         rospy.loginfo(f"Output directory: {self.output_dir}")
         
@@ -42,13 +43,19 @@ class ROSVideoRecorder:
             'cameras': {
                 'r1_color': {
                     'topic': '/r1/wrist_camera/color/image_raw',
-                    'fps': 30.0,
+                    'fps': 15.0,
                     'codec': 'mp4v',
                     'resize': None
                 },
                 'r2_color': {
                     'topic': '/r2/wrist_camera/color/image_raw',
-                    'fps': 30.0,
+                    'fps': 15.0,
+                    'codec': 'mp4v',
+                    'resize': None
+                },
+                'fixed_camera': {
+                    'topic': '/camera1/fixed_camera/image_raw',
+                    'fps': 15.0,
                     'codec': 'mp4v',
                     'resize': None
                 }
@@ -57,36 +64,72 @@ class ROSVideoRecorder:
     
     def _setup_subscribers(self):
         """Setup ROS subscribers"""
+        self.subscribers = {}
         for camera_name, camera_config in self.config['cameras'].items():
             topic = camera_config['topic']
 
             sub = rospy.Subscriber(
                 topic, Image,
                 lambda msg, name=camera_name: self._image_callback(msg, name),
-                queue_size=1
+                queue_size=10  # Increased queue size to prevent message loss
             )
-
+            
+            self.subscribers[camera_name] = sub
             self.latest_frames[camera_name] = None
             self.frame_counts[camera_name] = 0
 
             rospy.loginfo(f"Subscribing to: {camera_name} -> {topic}")
+            
+        
+        # Initialize last received time tracking
+        self.last_received_time = {}
+        for camera_name in self.config['cameras'].keys():
+            self.last_received_time[camera_name] = 0.0
+
+    def _check_topic_availability(self):
+        """Check if topics are available"""
+        available_topics = rospy.get_published_topics()
+        topic_names = [topic[0] for topic in available_topics]
+        
+        for camera_name, camera_config in self.config['cameras'].items():
+            topic = camera_config['topic']
+            if topic not in topic_names:
+                rospy.logwarn(f"Topic {topic} for {camera_name} is not available!")
+                rospy.loginfo("Available topics:")
+                for available_topic in topic_names:
+                    if 'camera' in available_topic or 'image' in available_topic:
+                        rospy.loginfo(f"  - {available_topic}")
 
     def _image_callback(self, msg, camera_name):
-        """Handle Image messages"""
+        """Handle Image messages - optimized for recording performance"""
         try:
+            # Update last received time
+            self.last_received_time[camera_name] = rospy.get_time()
+            
             # Color image processing
             if msg.encoding == "rgb8":
                 cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             else:
                 cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             
-            with self.lock:
-                self.latest_frames[camera_name] = cv_image.copy()
-                if self.recording and camera_name in self.video_writers:
-                    self._write_frame(camera_name, cv_image)
+            # For better performance: record first, then update frames
+            if self.recording and camera_name in self.video_writers:
+                self._write_frame(camera_name, cv_image)
+            
+            # Only update latest_frames when needed (for recording initialization or occasionally)
+            if (not self.recording and self.latest_frames[camera_name] is None) or \
+               (self.recording and self.frame_counts[camera_name] % 60 == 0):
+                # Use non-blocking lock to avoid delays
+                if self.lock.acquire(blocking=False):
+                    try:
+                        self.latest_frames[camera_name] = cv_image.copy()
+                    finally:
+                        self.lock.release()
                     
         except Exception as e:
             rospy.logerr(f"Image processing error {camera_name}: {e}")
+            import traceback
+            rospy.logerr(f"Traceback: {traceback.format_exc()}")
     
     
     def _write_frame(self, camera_name, frame):
@@ -103,6 +146,10 @@ class ROSVideoRecorder:
         
         self.video_writers[camera_name].write(frame)
         self.frame_counts[camera_name] += 1
+        
+        # Log every 30 frames (roughly every second at 30fps)
+        if self.frame_counts[camera_name] % 30 == 0:
+            rospy.loginfo(f"{camera_name}: {self.frame_counts[camera_name]} frames recorded")
     
     def start_recording(self, session_name=None):
         """Start recording"""
@@ -234,7 +281,10 @@ def main():
         # Create recorder with default configuration
         recorder = ROSVideoRecorder()
         
-        # Start preview mode by default
+        # Wait a bit for topics to be available
+        rospy.sleep(3)
+        
+        # Start preview mode (press 'r' to start/stop recording)
         recorder.preview_cameras()
             
     except KeyboardInterrupt:
