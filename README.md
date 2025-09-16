@@ -16,10 +16,23 @@ roslaunch lego_manipulation lego_manipulation_node.launch
 1. Modify the configuration file `path_to_repo/config/user_config.json`.
 2. Download the controller at [ST Motion Controller](https://github.com/intelligent-control-lab/Stream_Motion_Controller) and the digital twin at [Robot Digital Twin](https://github.com/intelligent-control-lab/Robot_Digital_Twin).
 3. Switch all three repos to `dual-arm-mfi` branch.
-4. Example command to assemble a fish (i.e. defaul setting in the config file)
+4. Example command to assemble a fish (i.e. default setting in the config file)
 ```
 roslaunch lego_manipulation dual_arm_lego_manipulation_node.launch num_b2:=25 color_b2:=Blue color_b6:=Yellow color_b9:=Orange
 ```
+```
+roslaunch lego_manipulation dual_arm_lego_manipulation_node_tool11.launch num_b2:=25 color_b2:=Blue color_b6:=Yellow color_b9:=Orange
+
+rqt_image_view
+
+
+```
+
+```
+dual_arm_lego_manipulation_node.launch -> dual_gp4.launch -> gp4.launch -> gp4.xacro
+```
+
+
 
 ## Robot Manipulation Skills
 | <img src="./images/transit.gif" alt="Transit image" width="auto" height="220" title="Transit"/><br>Transit a brick</center> | <img src="./images/pick.gif" alt="Pick image" width="auto" height="220" title="Pick"/><br>Pick/Disassemble</center> | <img src="./images/place.gif" alt="Place image" width="auto" height="220" title="Place"/><br>Place/Assemble</center> | <img src="./images/support.gif" alt="Support image" width="auto" height="220" title="Support"/> <br>Support</center>|
@@ -31,6 +44,18 @@ roslaunch lego_manipulation dual_arm_lego_manipulation_node.launch num_b2:=25 co
 ## Robotic Lego Assembly in Motion
 | <img src="./images/vday.gif" alt="vday image" width="auto" height="210" title="vday"/><br>Surprise on Valentine's Day</center> | <img src="./images/dual_arm.gif" alt="dualarm" width="auto" height="210" title="dualarm"/><br>Multi-Robot Collaboration</center> | <img src="./images/fanuc.gif" alt="fanuc" width="auto" height="210" title="fanuc"/><br>Build More!</center> |
 | -------------------------------- | -------------------------- | ---------------------------- |
+
+
+
+## RealSense Gazebo ROS plugin
+
+```
+cd src
+git clone https://github.com/m-tartari/realsense_gazebo_plugin.git
+git clone https://github.com/m-tartari/realsense_gazebo_description.git
+
+```
+手动更改一下clip范围  _d435i.gazebo.xacro
 
 
 

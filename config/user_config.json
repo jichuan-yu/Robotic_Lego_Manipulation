@@ -11,7 +11,7 @@
     "r2_DH_tool_fname":"/config/robot_properties/gp4_tool_DH.txt",
     "r2_DH_tool_assemble_fname":"/config/robot_properties/gp4_tool_assemble_DH.txt",
     "r2_DH_tool_disassemble_fname":"/config/robot_properties/gp4_tool_disassemble_DH.txt",
-    "r2_DH_tool_alt_fname":"/config/robot_properties/gp4_tool_alt_DH.txt",
+    "r2_DH_tool_alt_fname":"/config/robot_properties/gp4_tool_alt_DH.txt", 
     "r2_DH_tool_alt_assemble_fname":"/config/robot_properties/gp4_tool_alt_assemble_DH.txt",
     "Robot2_Base_fname":"/config/robot_properties/r2_base.txt",
     
@@ -22,5 +22,12 @@
     "Waypoint_Travel_Time":1,
     "Use_yk":0,
     "Robot1_name":"r1",
-    "Robot2_name":"r2"
+    "Robot2_name":"r2",
+    "Comment":[
+        "DH_tool_fname: 0.072 + 0.0505 + tool_length - 0.0032", 
+        "DH_assemble_fname: 0.072 + 0.0505 + tool_length - 0.0032, -0.008", 
+        "DH_disassemble_fname: 0.072 + 0.0505 + tool_length - 0.0032 + 0.0096, 0.008",
+        "DH_tool_alt_fname: 0.072 + 0.0505 + tool_length - 0.008"
+    ]
 }
+

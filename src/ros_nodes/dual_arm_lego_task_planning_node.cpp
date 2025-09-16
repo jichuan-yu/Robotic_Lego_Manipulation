@@ -250,10 +250,10 @@ int main(int argc, char **argv)
                 lego_ptr->robot_reached_goal(robot2_q, r2_cur_goal, lego_ptr->robot_dof_2()) && lego_ptr->robot_is_static(robot2_qd, robot2_qdd, lego_ptr->robot_dof_2())))
             {
                 // Modify stmotion controller runtime
-            r1_controller_time_msg.data = jpc_travel_time;
-            r1_controller_time_pub.publish(r1_controller_time_msg);
-            r2_controller_time_msg.data = jpc_travel_time;
-            r2_controller_time_pub.publish(r2_controller_time_msg);
+                r1_controller_time_msg.data = jpc_travel_time;
+                r1_controller_time_pub.publish(r1_controller_time_msg);
+                r2_controller_time_msg.data = jpc_travel_time;
+                r2_controller_time_pub.publish(r2_controller_time_msg);
 
                 ROS_INFO_STREAM("Next step");
                 if (mode == 9 || mode == 24 || mode == 32)
