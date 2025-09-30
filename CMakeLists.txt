@@ -30,6 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   sensor_msgs
   message_generation
+  gazebo_ros_link_attacher
   # yk_api
 )
 
@@ -122,11 +123,24 @@ target_link_libraries(${PROJECT_NAME}_task_planning
 add_executable(${PROJECT_NAME}_dual_arm
   src/ros_nodes/dual_arm_lego_task_planning_node.cpp
 )
+
 add_dependencies(${PROJECT_NAME}_dual_arm
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 target_link_libraries(${PROJECT_NAME}_dual_arm
+    ${PROJECT_NAME}
+    ${catkin_LIBRARIES}
+)
+
+add_executable(expert_demo
+  src/ros_nodes/expert_demo_node.cpp
+)
+add_dependencies(expert_demo
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(expert_demo
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
 )

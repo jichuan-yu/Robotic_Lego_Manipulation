@@ -1930,5 +1930,52 @@ bool Lego::robot_reached_goal(math::VectorJd robot_q, math::VectorJd goal, const
 }
 
 
+void Lego::reset_brick(const std::string& brick_name, const int& orientation,
+                              const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z)
+{
+    auto it = brick_map_.find(brick_name);
+    if (it == brick_map_.end()) {
+        ROS_WARN_STREAM("Brick " << brick_name << " not found in brick_map_!");
+        return;
+    }
+
+    lego_brick& l_brick = it->second;
+    Eigen::Matrix4d brick_pose_mtx;
+
+    calc_brick_loc(l_brick, storage_plate_, orientation, brick_loc_x, brick_loc_y, brick_loc_z,
+                   brick_pose_mtx);
+
+    l_brick.press_side = orientation;
+    l_brick.x = brick_pose_mtx(0, 3);
+    l_brick.y = brick_pose_mtx(1, 3);
+    l_brick.z = brick_pose_mtx(2, 3);
+    l_brick.cur_x = brick_pose_mtx(0, 3);
+    l_brick.cur_y = brick_pose_mtx(1, 3);
+    l_brick.cur_z = brick_pose_mtx(2, 3);
+
+    Eigen::Matrix3d rot_mtx = brick_pose_mtx.block(0, 0, 3, 3);
+    Eigen::Quaterniond quat(rot_mtx);
+
+    l_brick.quat_x = quat.x();
+    l_brick.quat_y = quat.y();
+    l_brick.quat_z = quat.z();
+    l_brick.quat_w = quat.w();
+    l_brick.cur_quat = quat;
+
+    gazebo_msgs::ModelState brick_pose;
+    brick_pose.model_name = brick_name;
+    brick_pose.pose.position.x = brick_pose_mtx(0, 3);
+    brick_pose.pose.position.y = brick_pose_mtx(1, 3);
+    brick_pose.pose.position.z = brick_pose_mtx(2, 3);
+    brick_pose.pose.orientation.x = quat.x();
+    brick_pose.pose.orientation.y = quat.y();
+    brick_pose.pose.orientation.z = quat.z();
+    brick_pose.pose.orientation.w = quat.w();
+
+    setmodelstate_.request.model_state = brick_pose;
+    client_.call(setmodelstate_);
 }
+
+}
+
 }

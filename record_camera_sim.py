@@ -17,12 +17,12 @@ class ROSVideoRecorder:
         
         self.bridge = CvBridge()
         self.recording = False
-        self.video_writers = {}
+        self.video_writers = {} # VideoWriter objects for each camera
         self.latest_frames = {}
         self.frame_counts = {}
+        self.last_received_time = {} # Track last received time for each camera
         self.lock = threading.Lock()
         
-
         self.config = self._default_config()
         
         # Create output directory
@@ -45,19 +45,19 @@ class ROSVideoRecorder:
                     'topic': '/r1/wrist_camera/color/image_raw',
                     'fps': 15.0,
                     'codec': 'mp4v',
-                    'resize': None
+                    'resize': None # [width, height]
                 },
                 'r2_color': {
                     'topic': '/r2/wrist_camera/color/image_raw',
                     'fps': 15.0,
                     'codec': 'mp4v',
-                    'resize': None
+                    'resize': None # [width, height]
                 },
                 'fixed_camera': {
                     'topic': '/camera1/fixed_camera/image_raw',
                     'fps': 15.0,
                     'codec': 'mp4v',
-                    'resize': None
+                    'resize': None # [width, height]
                 }
             }
         }
@@ -80,25 +80,9 @@ class ROSVideoRecorder:
 
             rospy.loginfo(f"Subscribing to: {camera_name} -> {topic}")
             
-        
         # Initialize last received time tracking
-        self.last_received_time = {}
         for camera_name in self.config['cameras'].keys():
             self.last_received_time[camera_name] = 0.0
-
-    def _check_topic_availability(self):
-        """Check if topics are available"""
-        available_topics = rospy.get_published_topics()
-        topic_names = [topic[0] for topic in available_topics]
-        
-        for camera_name, camera_config in self.config['cameras'].items():
-            topic = camera_config['topic']
-            if topic not in topic_names:
-                rospy.logwarn(f"Topic {topic} for {camera_name} is not available!")
-                rospy.loginfo("Available topics:")
-                for available_topic in topic_names:
-                    if 'camera' in available_topic or 'image' in available_topic:
-                        rospy.loginfo(f"  - {available_topic}")
 
     def _image_callback(self, msg, camera_name):
         """Handle Image messages - optimized for recording performance"""
@@ -107,10 +91,7 @@ class ROSVideoRecorder:
             self.last_received_time[camera_name] = rospy.get_time()
             
             # Color image processing
-            if msg.encoding == "rgb8":
-                cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            else:
-                cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             
             # For better performance: record first, then update frames
             if self.recording and camera_name in self.video_writers:
@@ -151,6 +132,7 @@ class ROSVideoRecorder:
         if self.frame_counts[camera_name] % 30 == 0:
             rospy.loginfo(f"{camera_name}: {self.frame_counts[camera_name]} frames recorded")
     
+
     def start_recording(self, session_name=None):
         """Start recording"""
         if self.recording:
@@ -271,7 +253,7 @@ class ROSVideoRecorder:
                 if self.recording:
                     self.stop_recording()
                 else:
-                    self.start_recording("lego_manual_record")
+                    self.start_recording("lego_record_sim")
 
         cv2.destroyAllWindows()
     

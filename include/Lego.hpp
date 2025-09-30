@@ -88,15 +88,18 @@ class Lego
 
         void update_all_top_bricks(const std::string& brick_name, const Eigen::Matrix4d& dT);
         void update(const std::string& brick_name, const Eigen::Matrix4d& T);
+    
+        /****************************************************************/
         void calc_brick_loc(const lego_brick& brick, const lego_plate& plate, const int& orientation,
                             const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z, 
                             Eigen::Matrix4d& out_pose);
+        /****************************************************************/
         bool is_top_connect(const lego_brick& b1, const lego_brick& b2);
         bool is_bottom_connect(const lego_brick& b1, const lego_brick& b2);
         bool bricks_overlap(const lego_brick& b1, const lego_brick& b2);
         void get_brick_corners(const lego_brick& b1, double& lx, double& ly, double& rx, double& ry);
         void brick_dimension_from_name(const std::string& b_name, int& height, int& width, const Json::Value& lego_lib);
-
+        
 
     public:
         Lego();
@@ -125,15 +128,21 @@ class Lego
         void set_storage_plate_pose(const double& x, const double& y, const double& z, const double& roll, const double& pitch, const double& yaw);
         void set_world_base(const std::string& world_base_fname);
 
+
+        /****************************************************************/
         void update_bricks(const math::VectorJd& robot_q, const Eigen::MatrixXd& DH, const Eigen::MatrixXd& base_frame, 
                            const bool& joint_rad, const std::string& brick_name, const int& mode);
         std::string get_brick_name_by_id(const int& id, const int& seq_id);
+        void reset_brick(const std::string& brick_name, const int& orientation,
+                            const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z);
         void update_brick_connection();
         void calc_brick_grab_pose(const std::string& name, const bool& assemble_pose, const bool& take_brick,
                                   const int& brick_assemble_x, const int& brick_assemble_y, const int& brick_assemble_z, 
                                   const int& orientation, const int& press_side, Eigen::MatrixXd& T);
         void calc_brick_sup_pose(const std::string&name, const Eigen::MatrixXd& cart_T, const int& dx, const int& dy, const int& dz, const bool &offset, Eigen::MatrixXd &T);
 
+        /****************************************************************/
+        /****************************************************************/
         void brick_pose_in_stock(const std::string& name, const int& press_side, const int& press_offset, Eigen::Matrix4d& T);
         void support_pose_down_pre(const int& x, const int& y, const int& z, const int& ori, Eigen::Matrix4d& T);
         void support_pose_down(const int& x, const int& y, const int& z, const int& ori, Eigen::Matrix4d& T);
@@ -184,6 +193,8 @@ class Lego
         double brick_height() {return brick_height_m_;};
         double lever_wall_height() {return lever_wall_height_;};
         double knob_height() {return knob_height_;};
+
+        // 
 };
 }
 }

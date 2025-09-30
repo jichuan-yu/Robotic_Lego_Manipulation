@@ -20,18 +20,36 @@ roslaunch lego_manipulation lego_manipulation_node.launch
 ```
 roslaunch lego_manipulation dual_arm_lego_manipulation_node.launch num_b2:=25 color_b2:=Blue color_b6:=Yellow color_b9:=Orange
 ```
+
+- run new demo with wrist cam:
 ```
-roslaunch lego_manipulation dual_arm_lego_manipulation_node_tool11.launch num_b2:=25 color_b2:=Blue color_b6:=Yellow color_b9:=Orange
+roslaunch lego_manipulation dual_arm_lego_manipulation_node_wristcam.launch num_b4:=25 color_b2:=Blue color_b6:=Yellow color_b9:=Orange
 
 rqt_image_view
-
-
 ```
 
+
+`dual_arm_lego_manipulation_node.launch -> dual_gp4.launch -> gp4.launch -> gp4.xacro`
+
+
+## Dual arm imitation
 ```
-dual_arm_lego_manipulation_node.launch -> dual_gp4.launch -> gp4.launch -> gp4.xacro
+roslaunch lego_manipulation dual_arm_imitation_node.launch num_b2:=1 color_b2:=Blue 
+
+rosrun lego_manipulation expert_demo _config_fname:=$(rospack find lego_manipulation)/config/expert_demo_config.json _root_pwd:=$(rospack find lego_manipulation)/
+
+rqt_image_view
 ```
 
+rosservice call /link_attacher_node/attach "model_name_1: 'b2_1'
+link_name_1: 'brick'
+model_name_2: 'gp4_arm_/r1/'
+link_name_2: 'link_tool'"
+
+rosservice call /link_attacher_node/detach "model_name_1: 'b2_1'
+link_name_1: 'brick'
+model_name_2: 'gp4_arm_/r1/'
+link_name_2: 'link_tool'"
 
 
 ## Robot Manipulation Skills
@@ -44,19 +62,6 @@ dual_arm_lego_manipulation_node.launch -> dual_gp4.launch -> gp4.launch -> gp4.x
 ## Robotic Lego Assembly in Motion
 | <img src="./images/vday.gif" alt="vday image" width="auto" height="210" title="vday"/><br>Surprise on Valentine's Day</center> | <img src="./images/dual_arm.gif" alt="dualarm" width="auto" height="210" title="dualarm"/><br>Multi-Robot Collaboration</center> | <img src="./images/fanuc.gif" alt="fanuc" width="auto" height="210" title="fanuc"/><br>Build More!</center> |
 | -------------------------------- | -------------------------- | ---------------------------- |
-
-
-
-## RealSense Gazebo ROS plugin
-
-```
-cd src
-git clone https://github.com/m-tartari/realsense_gazebo_plugin.git
-git clone https://github.com/m-tartari/realsense_gazebo_description.git
-
-```
-手动更改一下clip范围  _d435i.gazebo.xacro
-
 
 
 ## Citation
