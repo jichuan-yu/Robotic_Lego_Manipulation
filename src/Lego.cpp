@@ -164,6 +164,19 @@ void Lego::setup_dual_arm(const std::string& env_setup_fname, const std::string&
         setmodelstate_.request.model_state = brick_pose;
         client_.call(setmodelstate_);
     }
+
+    // set the marker
+    marker_.brick_name = "marker";
+    marker_.height = 1;
+    marker_.width = 2;
+    marker_.x = 0;
+    marker_.y = 0;
+    marker_.z = 0;
+    marker_.quat_x = 0;
+    marker_.quat_y = 0;
+    marker_.quat_z = 0;
+    marker_.quat_w = 1;
+
     update_brick_connection();
     usleep(1000 * 1000); 
 }
@@ -1975,6 +1988,51 @@ void Lego::reset_brick(const std::string& brick_name, const int& orientation,
     setmodelstate_.request.model_state = brick_pose;
     client_.call(setmodelstate_);
 }
+
+void Lego::set_marker(const int& orientation,
+                              const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z)
+{
+
+    Eigen::Matrix4d brick_pose_mtx;
+
+    calc_brick_loc(marker_, storage_plate_, orientation, brick_loc_x, brick_loc_y, brick_loc_z,
+                   brick_pose_mtx);
+
+    marker_.press_side = orientation;
+    marker_.x = brick_pose_mtx(0, 3);
+    marker_.y = brick_pose_mtx(1, 3);
+    marker_.z = brick_pose_mtx(2, 3);
+    marker_.cur_x = brick_pose_mtx(0, 3);
+    marker_.cur_y = brick_pose_mtx(1, 3);
+    marker_.cur_z = brick_pose_mtx(2, 3);
+
+    Eigen::Matrix3d rot_mtx = brick_pose_mtx.block(0, 0, 3, 3);
+    Eigen::Quaterniond quat(rot_mtx);
+
+    marker_.quat_x = quat.x();
+    marker_.quat_y = quat.y();
+    marker_.quat_z = quat.z();
+    marker_.quat_w = quat.w();
+    marker_.cur_quat = quat;
+
+    gazebo_msgs::ModelState brick_pose;
+    brick_pose.model_name = marker_.brick_name;
+    brick_pose.pose.position.x = brick_pose_mtx(0, 3);
+    brick_pose.pose.position.y = brick_pose_mtx(1, 3);
+    brick_pose.pose.position.z = brick_pose_mtx(2, 3);
+    brick_pose.pose.orientation.x = quat.x();
+    brick_pose.pose.orientation.y = quat.y();
+    brick_pose.pose.orientation.z = quat.z();
+    brick_pose.pose.orientation.w = quat.w();
+    
+    setmodelstate_.request.model_state = brick_pose;
+    try{
+        client_.call(setmodelstate_);
+    } catch (const std::exception& e) {
+        ROS_ERROR_STREAM("Failed to set marker state: " << e.what());
+    }
+}
+
 
 }
 

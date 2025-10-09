@@ -38,7 +38,15 @@ roslaunch lego_manipulation dual_arm_imitation_node.launch num_b2:=1 color_b2:=B
 
 rosrun lego_manipulation expert_demo _config_fname:=$(rospack find lego_manipulation)/config/expert_demo_config.json _root_pwd:=$(rospack find lego_manipulation)/
 
+rosrun lego_manipulation eval_policy _config_fname:=$(rospack find lego_manipulation)/config/expert_demo_config.json _root_pwd:=$(rospack find lego_manipulation)/
+
+
 rqt_image_view
+```
+
+```
+dual_arm_imitation_node.launch -> dual_gp4_imitation.launch -> gp4_wristcam.launch -> gp4.xacro
+                                                            -> physics_lego.launch -> bx_physics.launch
 ```
 
 rosservice call /link_attacher_node/attach "model_name_1: 'b2_1'

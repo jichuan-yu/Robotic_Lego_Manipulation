@@ -3,8 +3,10 @@
 #include <ros/ros.h>
 #include <string>
 #include <std_msgs/Int32.h>
+#include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Bool.h>
 #include "gazebo_ros_link_attacher/Attach.h"
-
+#include <random>
 
 using namespace std;
 
@@ -23,15 +25,24 @@ public:
 
     void reset_brick(const string& brick_name, const int& orientation,
                         const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z);
+    void set_marker(const int& orientation,
+                        const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z);
 
     Eigen::Matrix4d random_perturbation(double pos_std, double rot_std_deg);
     // Robot Skills
     void homing(RobotID robot_id);
     void moveJoint(RobotID robot_id, lego_manipulation::math::VectorJd& q);
     void pick(RobotID robot_id, const std::string& brick_name, int press_side, int press_offset);
-    
+    void pick_prepare(RobotID robot_id, const std::string& brick_name, int press_side, int press_offset);
+
     void attach_brick(RobotID robot_id, const std::string& brick_name);
     void detach_brick(RobotID robot_id, const std::string& brick_name);
+
+    void start_recording();
+    void stop_recording();
+
+    bool show_marker = false; // A 1x2 brick as marker 
+
 private:
     ros::NodeHandle nh_, private_nh_;
     lego_manipulation::lego::Lego::Ptr lego_ptr_;
@@ -44,14 +55,17 @@ private:
     ros::Publisher r1_goal_pub_, r2_goal_pub_, r1_controller_time_pub_, r2_controller_time_pub_;
     ros::Subscriber r1_robot_state_sub_, r2_robot_state_sub_;
 
+    ros::Publisher start_recording_pub_, stop_recording_pub_; // rosbag recording control
+
     ros::Publisher robot2_status_pub_, robot2_mode_pub_; // Robot mode publisher
     RobotMode robot1_mode_ = RobotMode::Idle;
     RobotMode robot2_mode_ = RobotMode::Idle;
     
     int control_rate_ = 10; // Hz
-    double jpc_travel_time_;
-
+    double jpc_travel_time_ = 5;
+    
     // Robot states
+    void pub_jpc_travel_time(RobotID robot_id, double time);
     void pubJointGoal(RobotID robot_id, const lego_manipulation::math::VectorJd& q);
     double EPS_ = 1e-5; // Threshold to determine if the robot has reached the goal
     bool reachGoal(lego_manipulation::math::VectorJd& current_q, lego_manipulation::math::VectorJd& goal_q);
@@ -99,10 +113,5 @@ private:
     int twist_deg_ = 0;
 
 };
-
-
-
-
-
 
 

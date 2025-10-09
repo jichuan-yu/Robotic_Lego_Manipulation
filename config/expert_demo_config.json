@@ -19,7 +19,7 @@
     "Task_Graph_fname":"/config/assembly_tasks/fish.json",
     "lego_lib_fname":"/config/lego_library.json",
     "Twist_Deg":14,
-    "Waypoint_Travel_Time":2,
+    "Waypoint_Travel_Time":5.0,
     "Use_yk":0,
     "Robot1_name":"r1",
     "Robot2_name":"r2",

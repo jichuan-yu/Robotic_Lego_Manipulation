@@ -16,7 +16,7 @@
     <arg name="color_b10" default="Red"/> 
     <arg name="color_b12" default="Red"/> 
 
-    <include file="$(find robot_digital_twin)/launch/dual_gp4_wristcam.launch">
+    <include file="$(find robot_digital_twin)/launch/dual_gp4_imitation.launch">
         <arg name="num_b2" value="$(arg num_b2)" /> 
         <arg name="num_b3" default="$(arg num_b3)"/> 
         <arg name="num_b4" default="$(arg num_b4)"/> 

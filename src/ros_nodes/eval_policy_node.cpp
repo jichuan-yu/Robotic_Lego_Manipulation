@@ -108,7 +108,7 @@ void get_marker_position(int orientation, int brick_loc_x, int brick_loc_y, int 
 
 
 void single_b2_1_pick(int argc, char **argv) {
-    ros::init(argc, argv, "expert_demo_node");
+    ros::init(argc, argv, "policy_eval_node");
     ros::NodeHandle nh;
     ros::NodeHandle private_nh("~");
 
@@ -119,7 +119,7 @@ void single_b2_1_pick(int argc, char **argv) {
     async_spinner.start();
 
     int max_episodes;
-    private_nh.param("max_episodes", max_episodes, 100);
+    private_nh.param("max_episodes", max_episodes, 10);
 
     std::string brick_name = "b2_1";
     int orientation, brick_loc_x, brick_loc_y, brick_loc_z, press_side, press_offset;
@@ -141,10 +141,18 @@ void single_b2_1_pick(int argc, char **argv) {
                                 marker_orientation, marker_x, marker_y, marker_z);
             expert_demo.set_marker(marker_orientation, marker_x, marker_y, marker_z);
         }
-        expert_demo.pick(RobotID::Robot1, brick_name, press_side, press_offset);
-        expert_demo.detach_brick(RobotID::Robot1, brick_name);
-        ROS_INFO("Episode %d completed", episode + 1);
-        ros::Duration(1.0).sleep(); // wait for a while to stabilize
+        expert_demo.pick_prepare(RobotID::Robot1, brick_name, press_side, press_offset);
+        expert_demo.start_recording();
+        ros::Duration(45.0).sleep(); 
+        
+
+        
+        expert_demo.stop_recording();
+        ros::Duration(0.5).sleep(); // wait for a while to stabilize
+        expert_demo.stop_recording();
+        ros::Duration(0.5).sleep(); // wait for a while to stabilize
+        ROS_INFO("Episode %d completed, update brick", episode + 1);
+
     }
 }
 
@@ -155,5 +163,12 @@ int main(int argc, char **argv)
     single_b2_1_pick(argc, argv);
     return 0;
 }
+
+
+
+
+
+
+
 
 

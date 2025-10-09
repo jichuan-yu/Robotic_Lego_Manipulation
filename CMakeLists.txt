@@ -145,5 +145,18 @@ target_link_libraries(expert_demo
     ${catkin_LIBRARIES}
 )
 
+add_executable(eval_policy
+  src/ros_nodes/eval_policy_node.cpp
+)
+add_dependencies(eval_policy
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(eval_policy
+    ${PROJECT_NAME}
+    ${catkin_LIBRARIES}
+)
+
+
 install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

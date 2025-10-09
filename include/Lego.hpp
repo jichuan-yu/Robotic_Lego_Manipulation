@@ -49,6 +49,7 @@ class Lego
     /* -------------------------------------------------------------------------- */
     private:
         std::map<std::string, lego_brick> brick_map_;
+        lego_brick marker_; // an 1x2 LEGO brick as the marker
         ros::ServiceClient client_; 
         gazebo_msgs::SetModelState setmodelstate_;
         double brick_height_m_ = 0.0096;
@@ -133,8 +134,12 @@ class Lego
         void update_bricks(const math::VectorJd& robot_q, const Eigen::MatrixXd& DH, const Eigen::MatrixXd& base_frame, 
                            const bool& joint_rad, const std::string& brick_name, const int& mode);
         std::string get_brick_name_by_id(const int& id, const int& seq_id);
+        /*********************************Jerry*******************************/  
         void reset_brick(const std::string& brick_name, const int& orientation,
                             const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z);
+        void set_marker(const int& orientation,
+                            const int& brick_loc_x, const int& brick_loc_y, const int& brick_loc_z);
+        /*********************************Jerry*******************************/  
         void update_brick_connection();
         void calc_brick_grab_pose(const std::string& name, const bool& assemble_pose, const bool& take_brick,
                                   const int& brick_assemble_x, const int& brick_assemble_y, const int& brick_assemble_z, 

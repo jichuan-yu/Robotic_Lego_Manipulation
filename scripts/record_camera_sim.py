@@ -39,7 +39,7 @@ class ROSVideoRecorder:
     def _default_config(self):
         """Default configuration"""
         return {
-            'output_dir': os.path.expanduser('./data/'),
+            'output_dir': os.path.expanduser('../data/'),
             'cameras': {
                 'r1_color': {
                     'topic': '/r1/wrist_camera/color/image_raw',
